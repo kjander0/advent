@@ -1,5 +1,5 @@
 -- Read lines of file
-local inputFile = io.open('input2', 'r')
+local inputFile = io.open('input', 'r')
 local inputLines = {}
 while true do
     local line = inputFile:read()
@@ -20,23 +20,6 @@ for elem in string.gmatch(inputLines[2], "%w+") do
     end
 end
 
-function reverse(list)
-    newList = {}
-    for i = #list, 1, -1 do
-        table.insert(newList, list[i])
-    end
-    return newList
-end
-
---local product = 1
---for _, bus in ipairs(busList) do
---    if bus > 0 then
---        product = product * bus
---    end
---end
---print(product)
-
-
 function findFirst(busIndex, jumpMulti)
     if busIndex ~= #busList then
         local nextBusIndex = busIndex + 1
@@ -46,9 +29,11 @@ function findFirst(busIndex, jumpMulti)
         local targetDiff = nextBusIndex - busIndex
 
         local t1 = busList[busIndex]
-        local t2 = busList[busIndex+1]
+        local t2 = busList[nextBusIndex]
         local first, second
+        print(t1, t2)
         while true do
+            --print("t1 t2", t1, t2)
             if t2 - t1 == targetDiff then
                 if first == nil then
                     first = t2
@@ -58,30 +43,41 @@ function findFirst(busIndex, jumpMulti)
                 end
             end
             t1 = t1 + busList[busIndex] * jumpMulti
-            t2 = busList[busIndex+1] * (t1 // busList[busIndex+1] + 1)
+            t2 = busList[nextBusIndex] * (t1 // busList[nextBusIndex] + 1)
         end
-        return findFirst(busIndex + 1, (second - first) // busList[busIndex+1])
+        return findFirst(nextBusIndex, (second - first) // busList[nextBusIndex])
     else
         -- find first here!
         local time = 0
         while true do
+            --print(time)
+            --if time > 100 then
+            --    print('ENDING EARLY')
+            --    break
+            --end
             time = time + busList[busIndex]
-            local lastTime = time + busList[busIndex]
+            local lastTime = time
             local lastIndex = busIndex
             local found = true
             for i = busIndex -1, 1, -1 do
                 if busList[i] ~= -1 then
                     local targetDiff = lastIndex - i
                     local newTime = busList[i] * (lastTime // busList[i])
+                    if newTime == lastTime then
+                        newTime = newTime - busList[i]
+                    end
+                    --print('t', newTime, lastTime)
                     if targetDiff ~= lastTime - newTime then
                         found = false
                         break
                     end
                     lastIndex = i
+                    lastTime = newTime
                 end
             end
             if found == true then 
-                return time - busIndex
+                --print("time", time)
+                return time - (busIndex -1)
             end
         end
     end
