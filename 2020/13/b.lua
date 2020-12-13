@@ -1,5 +1,6 @@
 -- Read lines of file
 local inputFile = io.open('input2', 'r')
+print(find(1, 1, 1))
 local inputLines = {}
 while true do
     local line = inputFile:read()
@@ -37,37 +38,53 @@ end
 --print(product)
 
 
-function find(busIndex, targetDiff, jump)
-    local bus = busList[busIndex]
-    if bus ~= -1 then
-        local t1 = busList[busIndex -1]
-        local t2 = busList[busIndex]
+function findFirst(busIndex, jumpMulti)
+    if busIndex ~= #busList then
+        local nextBusIndex = busIndex + 1
+        while busList[nextBusIndex] == -1 do
+            nextBusIndex = nextBusIndex + 1
+        end
+        local targetDiff = busIndex2 - busIndex
+
+        local t1 = busList[busIndex]
+        local t2 = busList[busIndex+1]
         local first, second
         while true do
             if t2 - t1 == targetDiff then
                 if first == nil then
                     first = t2
-                else
+                elseif second == nil then
                     second = t2
                     break
                 end
             end
-            t2 = t2 + busList[busIndex]
-            while t1 < t2 do
-                t1 = t1 + busList[busIndex -1]
+            t1 = t1 + busList[busIndex] * jumpMulti
+            t2 = busList[busIndex+1] * (t1 // busList[busIndex+1] + 1)
+        end
+        return find(busIndex + 1, (second - first) // busList[busIndex+1])
+    else
+        -- find first here!
+        local t1 = busList[busIndex]
+        local t2 = busList[busIndex+1]
+        local first, second
+        NEED TO CHECK FULL LEFT TO RIGHT BUSES HERE
+        while true do
+            if t2 - t1 == targetDiff then
+                return t1
             end
         end
-        jump = jump * (second - first)
     end
+    
+
 end
 
-print(find(2, 1, busList[2]))
+print(findFirst(1, 1, 1))
 
 --local startDividend = busList[1]
 --local found =  false
 --while not found do
 --    found = true
---    local diff 
+--    local diff
 --    for i = 2, #busList do
 --        local divisor = busList[i]
 --        local dividend = startDividend + i - 1
