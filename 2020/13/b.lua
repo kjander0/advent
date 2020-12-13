@@ -36,23 +36,51 @@ end
 --end
 --print(product)
 
-local startDividend = busList[1]
-local found =  false
-while not found do
-    found = true
-    for i = 2, #busList do
-        local divisor = busList[i]
-        local dividend = startDividend + i - 1
-        if divisor ~= -1 then
-            if dividend % divisor ~= 0 then
-                found = false
-                break
+
+function find(busIndex, targetDiff, jump)
+    local bus = busList[busIndex]
+    if bus ~= -1 then
+        local t1 = busList[busIndex -1]
+        local t2 = busList[busIndex]
+        local first, second
+        while true do
+            if t2 - t1 == targetDiff then
+                if first == nil then
+                    first = t2
+                else
+                    second = t2
+                    break
+                end
+            end
+            t2 = t2 + busList[busIndex]
+            while t1 < t2 do
+                t1 = t1 + busList[busIndex -1]
             end
         end
-    end
-
-    if not found then
-        startDividend = startDividend + busList[1]
+        jump = jump * (second - first)
     end
 end
-print(startDividend)
+
+print(find(2, 1, busList[2]))
+
+--local startDividend = busList[1]
+--local found =  false
+--while not found do
+--    found = true
+--    local diff 
+--    for i = 2, #busList do
+--        local divisor = busList[i]
+--        local dividend = startDividend + i - 1
+--        if divisor ~= -1 then
+--            if dividend % divisor ~= 0 then
+--                found = false
+--                break
+--            end
+--        end
+--    end
+--
+--    if not found then
+--        startDividend = startDividend + busList[1]
+--    end
+--end
+--print(startDividend)
