@@ -1,6 +1,5 @@
 -- Read lines of file
 local inputFile = io.open('input2', 'r')
-print(find(1, 1, 1))
 local inputLines = {}
 while true do
     local line = inputFile:read()
@@ -44,7 +43,7 @@ function findFirst(busIndex, jumpMulti)
         while busList[nextBusIndex] == -1 do
             nextBusIndex = nextBusIndex + 1
         end
-        local targetDiff = busIndex2 - busIndex
+        local targetDiff = nextBusIndex - busIndex
 
         local t1 = busList[busIndex]
         local t2 = busList[busIndex+1]
@@ -61,16 +60,28 @@ function findFirst(busIndex, jumpMulti)
             t1 = t1 + busList[busIndex] * jumpMulti
             t2 = busList[busIndex+1] * (t1 // busList[busIndex+1] + 1)
         end
-        return find(busIndex + 1, (second - first) // busList[busIndex+1])
+        return findFirst(busIndex + 1, (second - first) // busList[busIndex+1])
     else
         -- find first here!
-        local t1 = busList[busIndex]
-        local t2 = busList[busIndex+1]
-        local first, second
-        NEED TO CHECK FULL LEFT TO RIGHT BUSES HERE
+        local time = 0
         while true do
-            if t2 - t1 == targetDiff then
-                return t1
+            time = time + busList[busIndex]
+            local lastTime = time + busList[busIndex]
+            local lastIndex = busIndex
+            local found = true
+            for i = busIndex -1, 1, -1 do
+                if busList[i] ~= -1 then
+                    local targetDiff = lastIndex - i
+                    local newTime = busList[i] * (lastTime // busList[i])
+                    if targetDiff ~= lastTime - newTime then
+                        found = false
+                        break
+                    end
+                    lastIndex = i
+                end
+            end
+            if found == true then 
+                return time - busIndex
             end
         end
     end
@@ -78,7 +89,7 @@ function findFirst(busIndex, jumpMulti)
 
 end
 
-print(findFirst(1, 1, 1))
+print(findFirst(1, 1))
 
 --local startDividend = busList[1]
 --local found =  false
