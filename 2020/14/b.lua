@@ -1,5 +1,5 @@
 -- Read lines of file
-local inputFile = io.open('input2', 'r')
+local inputFile = io.open('input', 'r')
 local inputLines = {}
 while true do
     local line = inputFile:read()
@@ -25,18 +25,20 @@ end
 
 function wildCardAddresses(addr, wildCardIndices)
     local addrList = {}
-    print("pow", math.pow(2, #wildCardIndices))
     for val = 0, math.pow(2, #wildCardIndices) -1 do
         local newAddr = addr
         for i = #wildCardIndices, 1, -1 do
             local offset = wildCardIndices[i]
-            local overwriteMask = 1 << offset
-            printBits('overmask', overwriteMask)
+            local overwriteMask = 1 << (offset - 1)
             local overwriteVal = val & 1
+            --printBits('overmask', overwriteMask)
             if overwriteVal == 1 then
-                newAddr = addr & overwriteMask
+                --printBits('addr    ', addr)
+                --printBits('overmask', overwriteMask)
+                newAddr = newAddr | overwriteMask
+                --printBits('newAddr ', newAddr)
             else
-                newAddr = addr & (~overwriteMask)
+                newAddr = newAddr & (~overwriteMask)
             end
             val = val >> 1
         end
@@ -61,25 +63,21 @@ for _, line in ipairs(inputLines) do
                 posMask = posMask | bit
                 negMask = negMask | (~bit & 1)
             else
-                table.insert(wildCardIndices, i)
+                table.insert(wildCardIndices, 37 - i)
             end
             if i < #newMask then
                 posMask = posMask << 1 
                 negMask = negMask << 1 
             end
         end
-        printBits('pos', posMask)
-        printBits('neg', negMask)
     else
         local addr, val = string.match(line, "mem%[(%d+)%] = (%d+)")
         addr = tonumber(addr)
         val = tonumber(val)
-        addr = (addr | posMask) & (~negMask)
-        print('=wilds=')
-        for wildAddr in pairs(wildCardAddresses(addr, wildCardIndices)) do
-            printBits('wild', wildAddr)
+        addr = (addr | posMask) --& (~negMask)
+        for k, wildAddr in pairs(wildCardAddresses(addr, wildCardIndices)) do
+            mem[wildAddr] = val
         end
-        print(#wildCardIndices)
     end
 end
 local sum = 0
