@@ -20,7 +20,7 @@ for elem in string.gmatch(inputLines[2], "%w+") do
     end
 end
 
-function findFirst(busIndex, jumpMulti)
+function findFirst(busIndex, jumpMulti, startTime)
     if busIndex ~= #busList then
         local nextBusIndex = busIndex + 1
         while busList[nextBusIndex] == -1 do
@@ -28,12 +28,13 @@ function findFirst(busIndex, jumpMulti)
         end
         local targetDiff = nextBusIndex - busIndex
 
-        local t1 = busList[busIndex]
-        local t2 = busList[nextBusIndex]
+        local t1 = startTime
         local first, second
-        print(t1, t2)
         while true do
-            --print("t1 t2", t1, t2)
+            t2 = busList[nextBusIndex] * (t1 // busList[nextBusIndex] + 1)
+            while t2 - t1 < targetDiff do
+                t2 = t2 + busList[nextBusIndex]
+            end
             if t2 - t1 == targetDiff then
                 if first == nil then
                     first = t2
@@ -43,19 +44,13 @@ function findFirst(busIndex, jumpMulti)
                 end
             end
             t1 = t1 + busList[busIndex] * jumpMulti
-            t2 = busList[nextBusIndex] * (t1 // busList[nextBusIndex] + 1)
+
         end
-        return findFirst(nextBusIndex, (second - first) // busList[nextBusIndex])
+        return findFirst(nextBusIndex, (second - first) // busList[nextBusIndex], first)
     else
         -- find first here!
-        local time = 0
+        local time = startTime
         while true do
-            --print(time)
-            --if time > 100 then
-            --    print('ENDING EARLY')
-            --    break
-            --end
-            time = time + busList[busIndex]
             local lastTime = time
             local lastIndex = busIndex
             local found = true
@@ -66,7 +61,6 @@ function findFirst(busIndex, jumpMulti)
                     if newTime == lastTime then
                         newTime = newTime - busList[i]
                     end
-                    --print('t', newTime, lastTime)
                     if targetDiff ~= lastTime - newTime then
                         found = false
                         break
@@ -76,17 +70,23 @@ function findFirst(busIndex, jumpMulti)
                 end
             end
             if found == true then 
-                --print("time", time)
                 return time - (busIndex -1)
             end
+            time = time + busList[busIndex]
         end
     end
     
 
 end
 
-print(findFirst(1, 1))
+print("ans", findFirst(1, 1, 0))
 
+--local jumpAmount = 1
+--for _, bus in ipairs(busList) do
+--    jumpAmount = jumpAmount * bus
+--end
+--print(jumpAmount)
+--
 --local startDividend = busList[1]
 --local found =  false
 --while not found do
