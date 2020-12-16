@@ -67,14 +67,17 @@ end
 --for i = 1, #ruleList do
 --    table.insert(possibleRules, {table.unpack(ruleList)})
 --end
+--
 
 local running = true
+local solvedFields = {}
 while running do
     running = false
     for fieldIndex = 1, #ruleList do
-        local remainingRules = {}
-        for _, rule in ipairs(ruleList) do
-            if not rule.fieldIndex then
+        if not solvedFields[fieldIndex] then
+            running = true
+            local remainingRules = {}
+            for _, rule in ipairs(ruleList) do
                 local valid = true
                 for _, ticket in ipairs(validTickets) do
                     local field = ticket[fieldIndex]
@@ -87,12 +90,10 @@ while running do
                     table.insert(remainingRules, rule)
                 end
             end
-        end
-        if #remainingRules == 1 then
             print(#remainingRules)
-            remainingRules[1]['fieldIndex'] = fieldIndex
-        else
-            running = true
+            if #remainingRules == 1 then
+                solvedFields[fieldIndex] = remainingRules[1]
+            end
         end
     end
 end
