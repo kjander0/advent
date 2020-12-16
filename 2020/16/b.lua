@@ -63,37 +63,55 @@ for i = index, #inputLines do
     end
 end
 
---local possibleRules = {}
---for i = 1, #ruleList do
---    table.insert(possibleRules, {table.unpack(ruleList)})
---end
---
+function remove(list, elem)
+    local index
+    for i = 1, #list do
+        if list[i] == elem then
+            index = i
+        end
+    end
+    table.remove(list, index)
+end
 
-local running = true
-local solvedFields = {}
-while running do
-    running = false
-    for fieldIndex = 1, #ruleList do
-        if not solvedFields[fieldIndex] then
-            running = true
-            local remainingRules = {}
-            for _, rule in ipairs(ruleList) do
+local indicesToNames = {}
+local remainingRules = {table.unpack(ruleList)}
+local fieldList = {}
+for i = 1,20 do
+    table.insert(fieldList, {index=i, matchCount=0})
+end
+while #remainingRules > 0 do
+    for _, field in ipairs(fieldList) do
+        if not indicesToNames[field.index] then
+            local validRules = {}
+            for _, rule in ipairs(remainingRules) do
                 local valid = true
                 for _, ticket in ipairs(validTickets) do
-                    local field = ticket[fieldIndex]
-                    valid = checkValid(field, rule)
-                    if not valid then
+                    local field = ticket[field.index]
+                    if not checkValid(field, rule) then
+                        valid = false
                         break
                     end
                 end
                 if valid then
-                    table.insert(remainingRules, rule)
+                    table.insert(validRules, rule)
                 end
             end
-            print(#remainingRules)
-            if #remainingRules == 1 then
-                solvedFields[fieldIndex] = remainingRules[1]
+            field.matchCount = #validRules
+            if #validRules == 1 then
+                indicesToNames[field.index] = validRules[1].field
+                remove(remainingRules, validRules[1])
             end
         end
     end
+    table.sort(fieldList, function(first, second) return first.matchCount < second.matchCount end)
 end
+
+local product = 1
+for index, name in ipairs(indicesToNames) do
+    if string.match(name, "departure") then
+        local val = myTicket[index]
+        product = product * val
+    end
+end
+
+print(product)
