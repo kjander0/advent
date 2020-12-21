@@ -1,5 +1,5 @@
 -- Read lines of file
-local inputFile = io.open('input', 'r')
+local inputFile = io.open('input2', 'r')
 local inputLines = {}
 while true do
     local line = inputFile:read()
@@ -61,12 +61,18 @@ function check(msg, ruleNum)
                 end
             end
             if matches then
-                break
+                Record match to array
+                if ruleNum == 11 or ruleNum == 8 then
+                    proceed as if match didnt fail (no break)
+                else
+                    break
+                end
             end
         end
         if matches then
             print(ruleNum, msg, true)
             return true, rMsg
+
         else
             print(ruleNum, msg, false)
             return false, nil
