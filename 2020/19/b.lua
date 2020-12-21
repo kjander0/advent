@@ -1,5 +1,5 @@
 -- Read lines of file
-local inputFile = io.open('input2', 'r')
+local inputFile = io.open('input4', 'r')
 local inputLines = {}
 while true do
     local line = inputFile:read()
@@ -17,7 +17,7 @@ while inputLines[index] ~= '' do
     local line = inputLines[index]
     local ruleNumStr, ruleStr = string.match(line, "(%d+): (.+)")
     local ruleNum = tonumber(ruleNumStr)
-    
+
     local firstChar = string.sub(ruleStr, 1, 1)
     if firstChar == '"' then
         local ruleChar = string.sub(ruleStr, 2, 2)
@@ -41,49 +41,69 @@ end
 
 index = index + 1
 
-function check(msg, ruleNum)
+function check(msgList, ruleNum, depth)
+    prefix = ''
+    for i = 1, depth do
+        prefix = prefix .. ' '
+    end
+    print(prefix .. ruleNum)
+    for _, matchStr in ipairs(msgList) do
+        print(prefix, matchStr)
+    end
+    local matchList = {}
     local rule = ruleMap[ruleNum]
     if rule.char then
-        local match = string.sub(msg, 1, 1) == rule.char
-        print(ruleNum, msg, match)
-        return match, string.sub(msg, 2, #msg)
+        for _, msg in ipairs(msgList) do
+            local match = string.sub(msg, 1, 1) == rule.char
+            if match then
+                local newStr = string.sub(msg, 2, #msg)
+                table.insert(matchList,  newStr)
+            end
+        end
     else
-        local matches
-        local rMsg
+        local rMatchList
         for _, subList in ipairs(rule.subLists) do
-            matches = true
-            rMsg = msg
+            rMatchList = {table.unpack(msgList)}
             for i, subRuleNum in ipairs(subList) do
-                match, rMsg = check(rMsg, subRuleNum)
-                if not match then
-                    matches = false
+                rMatchList = check(rMatchList, subRuleNum, depth + 1)
+                if not rMatchList then
                     break
                 end
+
             end
-            if matches then
-                Record match to array
+            if rMatchList then
+                for _, matchStr in ipairs(rMatchList) do
+                    table.insert(matchList, matchStr)
+                end
                 if ruleNum == 11 or ruleNum == 8 then
-                    proceed as if match didnt fail (no break)
+                    -- proceed as if we didn't actually match
+                    ;
                 else
                     break
                 end
             end
         end
-        if matches then
-            print(ruleNum, msg, true)
-            return true, rMsg
-
-        else
-            print(ruleNum, msg, false)
-            return false, nil
-        end
     end
+    if #matchList == 0 then
+        return nil
+    end
+    return matchList
 end
 
 local sum = 0
 for i = index, #inputLines do
-    local match, rMsg = check(inputLines[i], 0)
-    if match and rMsg == '' then
+    local matchList = check({inputLines[i]}, 0, 1)
+    local success = false
+    if matchList then
+        for _, match in ipairs(matchList) do
+            if #match == 0 then
+                success = true
+                break
+            end
+        end
+    end
+    if success then
+        print('SUCCESS')
         print(inputLines[i], true)
         sum = sum + 1
     else
