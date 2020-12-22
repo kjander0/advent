@@ -1,5 +1,5 @@
 -- Read lines of file
-local inputFile = io.open('input4', 'r')
+local inputFile = io.open('input3', 'r')
 local inputLines = {}
 while true do
     local line = inputFile:read()
@@ -46,10 +46,6 @@ function check(msgList, ruleNum, depth)
     for i = 1, depth do
         prefix = prefix .. ' '
     end
-    print(prefix .. ruleNum)
-    for _, matchStr in ipairs(msgList) do
-        print(prefix, matchStr)
-    end
     local matchList = {}
     local rule = ruleMap[ruleNum]
     if rule.char then
@@ -75,12 +71,6 @@ function check(msgList, ruleNum, depth)
                 for _, matchStr in ipairs(rMatchList) do
                     table.insert(matchList, matchStr)
                 end
-                if ruleNum == 11 or ruleNum == 8 then
-                    -- proceed as if we didn't actually match
-                    ;
-                else
-                    break
-                end
             end
         end
     end
@@ -103,11 +93,8 @@ for i = index, #inputLines do
         end
     end
     if success then
-        print('SUCCESS')
-        print(inputLines[i], true)
         sum = sum + 1
     else
-        print(inputLines[i], false)
     end
 end
 print(sum)
