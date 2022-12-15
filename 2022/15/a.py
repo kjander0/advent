@@ -1,7 +1,5 @@
 infile = open('15/inputA', 'r')
 
-print(3435885 * 4000000 + 2639657)
-
 def parse_int(string):
     new_string = ''
     for c in string:
@@ -68,3 +66,5 @@ for target_row in range(4000001):
     if count != 4000001:
         print(target_row, result_ints)
         break
+
+print(3435885 * 4000000 + 2639657)
