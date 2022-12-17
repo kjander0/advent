@@ -1,8 +1,6 @@
-infile = open('17/testInput', 'r')
+infile = open('17/inputA', 'r')
 pattern = infile.readline().strip()
 print(pattern, len(pattern))
-
-
 
 shape_list = [
     [
@@ -51,13 +49,20 @@ def settle(x, y, shape, rows):
             py = sy + y
             rows[py][px] = '#'
 
+def compare(s0, s1):
+    for i in range(len(s0)):
+        r0 = s0[i]
+        r1 = s1[i]
+        for j in range(len(r0)):
+            if r0[j] != r1[j]:
+                return False
+    return True
+
 rows = [['#'] * 7]
 shape_index = 0
 rock_level = 0
 pattern_index = 0
 period = len(shape_list) * len(pattern)
-rock_count = 0
-start_level = 0
 for i in range(10 * period):
     shape = shape_list[shape_index]
     shape_index = (shape_index + 1) % len(shape_list)
@@ -90,13 +95,18 @@ for i in range(10 * period):
         x = nx
         y = ny
 
+sample = rows[-80:-60]
+print(len(sample))
+prev_match = 0
+for i in range(len(rows)):
+    other_sample = rows[i:i+20]
+    if compare(sample, other_sample):
+        print('matched!', i - prev_match)
+        prev_match = i
 
-index = 0
-for r in reversed(rows):
-    if index % period == 0:
-        print('---------------')
-    print(''.join(r))
-    index += 1
+
+# for r in reversed(rows):
+#     print(''.join(r))
 
     
 
