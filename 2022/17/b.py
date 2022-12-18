@@ -62,8 +62,9 @@ rows = [['#'] * 7]
 shape_index = 0
 rock_level = 0
 pattern_index = 0
-period = len(shape_list) * len(pattern)
-for i in range(10 * period):
+approx_period = len(pattern) * len(shape_list)
+sample_map = {}
+for i in range(18850):
     shape = shape_list[shape_index]
     shape_index = (shape_index + 1) % len(shape_list)
 
@@ -91,18 +92,26 @@ for i in range(10 * period):
             else:
                 settle(x, y, shape, rows)
                 rock_level = max(rock_level, y + len(shape)-1)
+
+                # sample = rows[rock_level-40:rock_level]
+                # key = (pattern_index, shape_index)
+                # if key in sample_map:
+                #     prev_sample, prev_level, prev_i = sample_map[key]
+                #     if compare(prev_sample, sample):
+                #         print('matched!', rock_level, rock_level - prev_level, i - prev_i)
+                # sample_map[key] = (sample, rock_level, i)
                 break
         x = nx
         y = ny
 
-sample = rows[-80:-60]
-print(len(sample))
-prev_match = 0
-for i in range(len(rows)):
-    other_sample = rows[i:i+20]
-    if compare(sample, other_sample):
-        print('matched!', i - prev_match)
-        prev_match = i
+num_rocks = 1725
+num_levels = 2728
+target = 1000000000000
+divs = target // num_rocks - 10
+required_init_rocks = target - divs * num_rocks
+print('required initial rocks', required_init_rocks)
+print('answer', rock_level + divs * num_levels)
+
 
 
 # for r in reversed(rows):
